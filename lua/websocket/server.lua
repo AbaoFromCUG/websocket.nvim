@@ -223,7 +223,7 @@ function WebsocketServer:listen(callbacks)
     if connection:establish() then
       -- print("establish:", vim.inspect(connection))
       if callbacks.on_connect then
-        self.conns[client_id] = connection
+        self.conns[connection.id] = connection
         callbacks.on_connect(connection)
       end
     else
