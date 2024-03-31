@@ -1,47 +1,60 @@
-# A Neovim Plugin Template
+# Neovim websocket client&server
 
-![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/ellisonleao/nvim-plugin-template/lint-test.yml?branch=main&style=for-the-badge)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/AbaoFromCUG/websocket.nvim/lint-test.yml?branch=main&style=for-the-badge)
 ![Lua](https://img.shields.io/badge/Made%20with%20Lua-blueviolet.svg?style=for-the-badge&logo=lua)
 
-A template repository for Neovim plugins.
 
 ## Using it
 
-Via `gh`:
 
+```lua
+local websocket = require("websocket")
+local server = websocket.Server:new({
+    host="127.0.0.1",
+    port="9001"
+})
+
+server:listen({
+    on_connect = function(new_connect)
+        new_connect:attach({
+            on_text=function()
+            end,
+            on_disconnect = function()
+            end
+        })
+        new_connect:send_text("Hello")
+    end,
+})
 ```
-$ gh repo create my-plugin -p ellisonleao/nvim-plugin-template
-```
 
-Via github web page:
 
-Click on `Use this template`
 
 ![](https://docs.github.com/assets/cb-36544/images/help/repository/use-this-template-button.png)
 
 ## Features and structure
 
 - 100% Lua
-- Github actions for:
+- Zero dependencies:
   - running tests using [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) and [busted](https://olivinelabs.com/busted/)
-  - check for formatting errors (Stylua)
-  - vimdocs autogeneration from README.md file
-  - luarocks release (LUAROCKS_API_KEY secret configuration required)
 
-### Plugin structure
+### Project structure
 
 ```
 .
 ├── lua
-│   ├── plugin_name
-│   │   └── module.lua
-│   └── plugin_name.lua
+│   ├── websocket
+│   │   ├── sha1.lua
+│   │   ├── base.lua
+│   │   ├── protocol.lua
+│   │   ├── server.lua
+│   │   └── client.lua
+│   └── websocket.lua
 ├── Makefile
 ├── plugin
-│   └── plugin_name.lua
+│   └── websocket.lua
 ├── README.md
 ├── tests
 │   ├── minimal_init.lua
-│   └── plugin_name
-│       └── plugin_name_spec.lua
+│   └── websocket
+│       └── websocket_spec.lua
 ```
