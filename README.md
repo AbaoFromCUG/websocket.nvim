@@ -31,30 +31,41 @@ server:listen({
 
 ![](https://docs.github.com/assets/cb-36544/images/help/repository/use-this-template-button.png)
 
+
 ## Features and structure
 
 - 100% Lua
 - Zero dependencies:
   - running tests using [plenary.nvim](https://github.com/nvim-lua/plenary.nvim) and [busted](https://olivinelabs.com/busted/)
 
+
+## Plugins using this
+- [neopyter](https://mirrors.sustech.edu.cn/pypi/simple/neopyter/)
+
 ### Project structure
 
-```
+``` tree
 .
+├── LICENSE
+├── Makefile
+├── README.md
+├── doc
+│   └── websocket.txt
+├── helper.py
 ├── lua
 │   ├── websocket
-│   │   ├── sha1.lua
 │   │   ├── base.lua
+│   │   ├── client.lua
 │   │   ├── protocol.lua
 │   │   ├── server.lua
-│   │   └── client.lua
+│   │   └── sha1.lua
 │   └── websocket.lua
-├── Makefile
 ├── plugin
 │   └── websocket.lua
-├── README.md
-├── tests
-│   ├── minimal_init.lua
-│   └── websocket
-│       └── websocket_spec.lua
+└── tests
+    ├── minimal_init.lua
+    └── websocket
+        ├── sha1_spec.lua
+        └── websocket_spec.lua
 ```
+

@@ -39,11 +39,13 @@ describe("transport", function()
       })
       server:listen({
         on_connect = function(connect)
+          -- print(vim.inspect(connect))
           connect:send_text("Hello")
           connect:attach({
             on_disconnect = function()
               -- defer for vim.system exit
               vim.defer_fn(function()
+                -- print("simple", coroutine.status(co))
                 coroutine.resume(co)
               end, 100)
             end,
@@ -78,6 +80,7 @@ describe("transport", function()
             end,
             on_disconnect = function()
               vim.defer_fn(function()
+                -- print("echo", coroutine.status(co))
                 coroutine.resume(co)
               end, 1000)
             end,
@@ -98,7 +101,7 @@ describe("transport", function()
       assert.spy(client_rec).was.called_with("Hello")
     end)
 
-    --- client1->server->client2
+    -- client1->server->client2
     it("client1->server->cllient2", function()
       kill_port_process(9004)
       local co = coroutine.running()
@@ -110,10 +113,12 @@ describe("transport", function()
       local first_connect, second_connect
       server:listen({
         on_connect = function(connect)
+          -- print(vim.inspect(connect))
           if first_connect == nil then
             first_connect = connect
             connect:attach({
               on_text = function(text)
+                -- print("text rec", text)
                 -- defer ensure second client connected
                 vim.defer_fn(function()
                   second_connect:send_text(text)
@@ -135,6 +140,7 @@ describe("transport", function()
         function(out)
           assert(out.code == 0, out.stderr)
           assert(out.stdout == "Hello")
+          -- print("loop", coroutine.status(co))
           coroutine.resume(co)
         end
       )
