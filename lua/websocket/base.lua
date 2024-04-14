@@ -1,4 +1,3 @@
-local a = require("plenary.async")
 
 ---@alias websocket.ClientCallbacks {on_disconnect: fun(), on_text: fun(text:string)}
 
@@ -8,13 +7,6 @@ local a = require("plenary.async")
 ---@field send_text fun(self:websocket.Clientable, text: string)
 ---@field close fun()
 local WebsocketClientable = {}
-
--- ---send text
--- ---@param text string
--- function WebsocketClientable:send_text(text)
---   a.uv.write(self.sock, text)
--- end
---
 
 ---set callback
 ---@param callbacks websocket.ClientCallbacks
