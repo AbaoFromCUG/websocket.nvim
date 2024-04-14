@@ -44,15 +44,16 @@ end
 
 ---@class websocket.ProtocolFrame
 ---@field fin 0|1
----@field rsv1? 0|1
----@field rsv2? 0|1
----@field rsv3? 0|1
----@field mask? 0|1
+---@field rsv1 0|1
+---@field rsv2 0|1
+---@field rsv3 0|1
+---@field mask 0|1
 ---@field opcode number 0x1-0xF 4bit number
 ---@field payload string
 
 ---comment
 ---@param frame websocket.ProtocolFrame
+---@return string
 function M.pack_frame(frame)
     local bytes = { 0, 0 }
     if frame.fin == 1 then
@@ -86,7 +87,6 @@ function M.pack_frame(frame)
             table.insert(bytes, b)
         end
     end
-    -- print(vim.inspect(bytes))
     return bytes2string(bytes) .. frame.payload
 end
 
@@ -94,7 +94,8 @@ local max_before_frag = math.pow(2, 13) -- 8192
 
 ---pack payload as frames
 ---@param message string
-function M.pack(message)
+---@return websocket.ProtocolFrame[]
+function M.to_frame(message)
     local remain = #message
     local sent = 0
     local frames = {}
@@ -102,16 +103,24 @@ function M.pack(message)
         local send = math.min(max_before_frag, remain) -- max size before fragment
         remain = remain - send
         local payload = string.sub(message, 1, send)
-        local frame = M.pack_frame({
-            fin = remain == 0 and 1 or 0,
-            opcode = sent == 0 and 0x1 or 1,
+        local fin = remain == 0 and 1 or 0
+        local frame = {
+            fin = fin,
+            opcode = sent == 0 and 0x1 or 0,
             payload = payload,
-        })
+        }
         table.insert(frames, frame)
         message = string.sub(message, send + 1)
         sent = sent + send
     end
     return frames
+end
+
+---convert msg to framebufs, split if need
+---@param message any
+---@return string[]
+function M.pack(message)
+    return vim.tbl_map(M.pack_frame, M.to_frame(message))
 end
 
 return M

@@ -12,12 +12,4 @@ describe("sha1", function()
         assert.equal(digest, "s3pPLMBiTxaQ9kYGzzhZRbK+xOo=")
     end)
 
-    it("async", function()
-        local co = coroutine.running()
-        vim.defer_fn(function()
-            coroutine.resume(co)
-        end, 1000)
-        --The test will reach here immediately.
-        coroutine.yield()
-    end)
 end)

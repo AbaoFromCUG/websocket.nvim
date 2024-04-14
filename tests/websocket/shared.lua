@@ -135,7 +135,9 @@ function M.get_fake_client(address, mode)
             read_queue:push_back(data)
         end,
     }, function(out)
-        -- print(vim.inspect(out))
+        if out.code ~= 0 then
+            print(vim.inspect(out))
+        end
         is_connected = false
         assert(out.code == 0, out.stderr)
     end)
@@ -224,6 +226,26 @@ function M.get_server(host, port)
             return connect_queue:pop_front_sync()
         end,
     }
+end
+
+local function readFile(path)
+    local fd = assert(vim.uv.fs_open(path, "r", 438))
+    local stat = assert(vim.uv.fs_fstat(fd))
+    local data = assert(vim.uv.fs_read(fd, stat.size, 0))
+    assert(vim.uv.fs_close(fd))
+    return data
+end
+
+---@param time? number
+---@return string
+function M.generate_longstr(time)
+    time = time or 1
+    local content = readFile("./tests/websocket/shared.lua")
+    local data = ""
+    for i in M.range(0, time) do
+        data = data .. content
+    end
+    return data
 end
 
 return M

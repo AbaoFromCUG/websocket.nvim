@@ -1,33 +1,36 @@
 #!/usr/bin/env python3
 from time import sleep
 import sys
-from typing import Dict,Callable
+import base64
+from typing import Dict, Callable
 
-# 
+#
 from websockets import ConnectionClosed
 from websockets.sync.client import connect
 import argparse
 from enum import Enum
 
 
-test_mode:Dict[str, Callable] = dict()
+test_mode: Dict[str, Callable] = dict()
 
 
-def sync_client_connect(address:str):
-    return connect(address,open_timeout = 200)
+def sync_client_connect(address: str):
+    return connect(address, open_timeout=200)
 
 
-def register(func:Callable):
+def register(func: Callable):
     test_mode[func.__name__] = func
     return func
 
+
 if True:
+
     @register
     def connection_establish():
         client = sync_client_connect(opts.address)
         sleep(2)
         client.close()
-    
+
     @register
     def connection_client_disconnect():
         with sync_client_connect(opts.address) as client:
@@ -45,7 +48,7 @@ if True:
             return 0
         sleep(10000)
         client.close()
-    
+
     @register
     def server2client():
         client = sync_client_connect(opts.address)
@@ -61,7 +64,17 @@ if True:
         sleep(0.5)
         client.close()
 
-    @register 
+    @register
+    def client2server_big():
+        with open("tests/websocket/shared.lua", "r", encoding="utf-8") as file:
+            data = file.read()
+            data = data * 1024
+            client = sync_client_connect(opts.address)
+            client.send(data)
+            sleep(0.5)
+            client.close()
+
+    @register
     def server2client2server():
         client = sync_client_connect(opts.address)
         result = client.recv()
@@ -70,7 +83,7 @@ if True:
         sleep(0.5)
         client.close()
 
-    @register 
+    @register
     def client2server2client():
         client = sync_client_connect(opts.address)
         client.send("bar")
@@ -101,9 +114,19 @@ if True:
         client = sync_client_connect(opts.address)
         for i in range(0, 10000):
             result = client.recv()
-            [prefix, num]=result.split(":")
-            assert(prefix=="foo")
+            [prefix, num] = result.split(":")
+            assert prefix == "foo"
             client.send(f"bar:{int(num)+1}")
+        sleep(0.5)
+        client.close()
+
+    @register
+    def reflex_server_big():
+        client = sync_client_connect(opts.address)
+        for i in range(0, 8):
+            data: str = client.recv()
+            data = data + data
+            client.send(data)
         sleep(0.5)
         client.close()
 
@@ -113,10 +136,11 @@ if True:
         for i in range(0, 10000):
             client.send(f"bar:{i}")
             result = client.recv()
-            assert(result==f"foo:{i+1}")
+            assert result == f"foo:{i+1}"
             print(result, end="", flush=True)
         sleep(0.5)
         client.close()
+
 
 parser = argparse.ArgumentParser()
 

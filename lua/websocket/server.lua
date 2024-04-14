@@ -45,9 +45,8 @@ function WebsocketConnection:new(sock)
 end
 
 function WebsocketConnection:send_text(str)
-    for _, frame in ipairs(protocol.pack(str)) do
-        self.sock:write(frame)
-    end
+    -- print("length", #str)
+    self.sock:write(protocol.pack(str))
 end
 
 function WebsocketConnection:close()
@@ -107,7 +106,7 @@ function WebsocketServer:listen(callbacks)
                 return retrieved
             end
 
-            local wsread = coroutine.wrap(function()
+            local wsread_co = coroutine.create(function()
                 while true do
                     local wsdata = ""
                     local fin
@@ -186,6 +185,7 @@ function WebsocketServer:listen(callbacks)
                     end
 
                     if opcode == 0x8 then -- CLOSE
+                        self.conns[connection.id] = nil
                         connection:_on_disconnect()
                         break
                     end
@@ -220,9 +220,20 @@ function WebsocketServer:listen(callbacks)
                         end
                     else
                         chunk_buffer = chunk_buffer .. chunk
-                        wsread()
+                        if coroutine.status(wsread_co) == "suspended" then
+                            local status, err = coroutine.resume(wsread_co)
+                            if status ~= true then
+                                print(err)
+                            end
+                        elseif connection ~= nil then
+                            self.conns[connection.id] = nil
+                            connection:_on_disconnect()
+                        else
+                            release_sock()
+                        end
                     end
                 elseif connection ~= nil then
+                    self.conns[connection.id] = nil
                     connection:_on_disconnect()
                 else
                     release_sock()
