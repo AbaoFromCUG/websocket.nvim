@@ -26,9 +26,6 @@ server:listen({
     end,
 })
 ```
-## Acknowledges
-* [firenvim](https://github.com/glacambre/firenvim) Embed Neovim in Chrome, Firefox & others.
-
 
 ## Features and structure
 
@@ -39,7 +36,6 @@ server:listen({
 
 ## Plugins using this
 - [neopyter](https://mirrors.sustech.edu.cn/pypi/simple/neopyter/)
-- [SHA-1 and HMAC-SHA1 Routines in Pure Lua](http://regex.info/blog/lua/sha1)
 
 ### Project structure
 
@@ -71,4 +67,8 @@ server:listen({
         ├── shared.lua
         └── websocket_spec.lua
 ```
+
+## Acknowledges
+* [firenvim](https://github.com/glacambre/firenvim) Embed Neovim in Chrome, Firefox & others.
+* [SHA-1 and HMAC-SHA1 Routines in Pure Lua](http://regex.info/blog/lua/sha1)
 
