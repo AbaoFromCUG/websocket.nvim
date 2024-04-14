@@ -3,9 +3,9 @@
 ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/AbaoFromCUG/websocket.nvim/lint-test.yml?branch=main&style=for-the-badge)
 ![Lua](https://img.shields.io/badge/Made%20with%20Lua-blueviolet.svg?style=for-the-badge&logo=lua)
 
-
 ## Using it
 
+### Server
 
 ```lua
 local websocket = require("websocket")
@@ -15,21 +15,19 @@ local server = websocket.Server:new({
 })
 
 server:listen({
-    on_connect = function(new_connect)
-        new_connect:attach({
-            on_text=function()
+    on_connect = function(connection)
+        connection:attach({
+            on_text=function(text)
+                new_connect:send_text("Hello")
             end,
             on_disconnect = function()
             end
         })
-        new_connect:send_text("Hello")
     end,
 })
 ```
-
-
-
-![](https://docs.github.com/assets/cb-36544/images/help/repository/use-this-template-button.png)
+## Acknowledges
+* [firenvim](https://github.com/glacambre/firenvim) Embed Neovim in Chrome, Firefox & others.
 
 
 ## Features and structure
@@ -41,17 +39,15 @@ server:listen({
 
 ## Plugins using this
 - [neopyter](https://mirrors.sustech.edu.cn/pypi/simple/neopyter/)
+- [SHA-1 and HMAC-SHA1 Routines in Pure Lua](http://regex.info/blog/lua/sha1)
 
 ### Project structure
 
 ``` tree
 .
-├── LICENSE
-├── Makefile
-├── README.md
 ├── doc
 │   └── websocket.txt
-├── helper.py
+├── LICENSE
 ├── lua
 │   ├── websocket
 │   │   ├── base.lua
@@ -60,12 +56,19 @@ server:listen({
 │   │   ├── server.lua
 │   │   └── sha1.lua
 │   └── websocket.lua
+├── Makefile
 ├── plugin
 │   └── websocket.lua
+├── README.md
 └── tests
+    ├── helper.py
     ├── minimal_init.lua
     └── websocket
+        ├── protocol_spec.lua
+        ├── queue_spec.lua
+        ├── server_spec.lua
         ├── sha1_spec.lua
+        ├── shared.lua
         └── websocket_spec.lua
 ```
 

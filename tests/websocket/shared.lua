@@ -1,5 +1,12 @@
 local WebsocketServer = require("websocket.server")
 
+local uv
+if vim.fn.has("nvim-0.10") == 1 then
+    uv = vim.uv
+else
+    uv = vim.loop
+end
+
 local M = {}
 
 local WAIT_TIMEOUT = 10000
@@ -229,10 +236,10 @@ function M.get_server(host, port)
 end
 
 local function readFile(path)
-    local fd = assert(vim.uv.fs_open(path, "r", 438))
-    local stat = assert(vim.uv.fs_fstat(fd))
-    local data = assert(vim.uv.fs_read(fd, stat.size, 0))
-    assert(vim.uv.fs_close(fd))
+    local fd = assert(uv.fs_open(path, "r", 438))
+    local stat = assert(uv.fs_fstat(fd))
+    local data = assert(uv.fs_read(fd, stat.size, 0))
+    assert(uv.fs_close(fd))
     return data
 end
 

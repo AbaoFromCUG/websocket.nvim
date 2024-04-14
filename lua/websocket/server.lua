@@ -1,6 +1,13 @@
 local WebsocketClientable = require("websocket.base")
 local protocol = require("websocket.protocol")
 
+local uv
+if vim.fn.has("nvim-0.10") == 1 then
+    uv = vim.uv
+else
+    uv = vim.loop
+end
+
 local client_id = 100
 
 local function nocase(s)
@@ -78,11 +85,11 @@ end
 --- start listen
 ---@param callbacks { on_connect: fun(client:websocket.Connection) }
 function WebsocketServer:listen(callbacks)
-    self.server = vim.uv.new_tcp()
+    self.server = uv.new_tcp()
     self.server:bind(self.host, self.port)
     local on_listen = function(err)
         assert(err == nil, err)
-        local sock = vim.uv.new_tcp()
+        local sock = uv.new_tcp()
         self.server:accept(sock)
 
         local function establish()
